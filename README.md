@@ -7,7 +7,7 @@ Developed by: Steve Callan  [http://callaninteractive.com](http://callaninteract
 About
 --------------------------------------
 
-QR Codes are 2 dimensional barcodes, scannable by cell phones that contain textual data rather than simply numeric.  In the QR Generator App, admins have the ability to create new codes using URL strings.  These scans are tracked and through the admin panel can be reiewed through various analytics tools. The QR Generator was built using [Codeigniter](http://codeigniter.com), [JQuery](http://jquery.com) and [Bootstrap](http://twitter.github.com/bootstrap/) frameworks.
+QR Codes are 2 dimensional barcodes, scannable by cell phones that contain textual data rather than simply numeric.  In the QR Generator App, admins have the ability to create new codes using URL strings.  These scans are tracked and through the admin panel can be reiewed through various analytics tools. The QR Generator was built using [Codeigniter](http://codeigniter.com), [JQuery](http://jquery.com) and [Bootstrap](http://twitter.github.com/bootstrap/) frameworks.  To generate the QR code, the script uses the QR code library written by [MaxLazar](http://eec.ms)
 
 
 Requirements (Codeigniter requirements)

@@ -14,11 +14,23 @@ class Dashboard extends CI_Controller {
 		$this->limit = 30;
 	}
 	
+// ------------------------------------------------------------------------
+
+/**
+ * index()
+ *
+ *  The main dashboard screen - this screen has a hicharts chart and 
+ *  a quick view of the most recent codes
+ *
+ * @param	string
+ * @return	VIEW
+ */
+	
 	function index()
 	{
 	
 	
-		/* Chart Data */
+		/* Load the Chart Data */
 			
 			$total_records = $this->key_model->count_all_days();
 			$start_point = $total_records-$this->limit;
@@ -60,8 +72,8 @@ class Dashboard extends CI_Controller {
 			$s_graph = $this->highcharts_lib->render();
 			$view_data["graph_source"] = $s_graph;
 			
-		/* Newest Codes */
-			$entries = $this->key_model->get_new_codes()->result();
+		/* Get and display the Newest Codes */
+			$entries = $this->key_model->get_paged_list()->result();
 			
 			$tmpl = array (
 				'row_start'		=> "<tr>",

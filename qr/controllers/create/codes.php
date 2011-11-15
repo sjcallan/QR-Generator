@@ -15,6 +15,17 @@ Class Codes extends CI_Controller
 		session_start();
 	}
 	
+// ------------------------------------------------------------------------
+
+/**
+ * index()
+ *
+ *  Main codes view page - displays a table of codes that can be paged.
+ *
+ * @access	public
+ * @return	VIEW
+ */
+	
 	function index()
 	{
 	
@@ -98,6 +109,17 @@ Class Codes extends CI_Controller
 		
 		$this->load->view("_master",$master_data);
 	}
+
+// ------------------------------------------------------------------------
+
+/**
+ * create()
+ *
+ *  creates a new code based on values from the Create New QR Code Form
+ *
+ * @access	public
+ * @return	REDIRECT
+ */
 	
 	public function create()
 	{
@@ -112,11 +134,23 @@ Class Codes extends CI_Controller
 	
 	}
 	
+// ------------------------------------------------------------------------
+
+/**
+ * details()
+ *
+ *  the details view of a given qr code - displays a hichart and code details with a button to delete the code if needed
+ *
+ * @access	public
+ * @param	string - $key - the qr key
+ * @return	VIEW
+ */
+	
 	public function details($key)
 	{
 			$key_details = $this->key_model->get_details($key);
 	
-		/* Chart Data */
+		/* Genereate Chart Data */
 			
 			$total_records = $this->key_model->count_all_days();
 			$start_point = $total_records-$this->limit;
@@ -168,14 +202,42 @@ Class Codes extends CI_Controller
 			$this->load->view("_master",$master_data);
 		
 	}
+	
+// ------------------------------------------------------------------------
+
+/**
+ * generate()
+ *
+ *  generates a qr code based on a key, size and width
+ *
+ * @access	public
+ * @param	string - $key - the qr code key
+ * @param	int - $size - the size of the qr code, 15 is LARGE 
+ * @param	int - $width - the img width you want
+ * @return	TRUE
+ */
 
 	public function generate($key, $size, $width)
 	{
 		
 		/* Return the image */
 			echo($this->qr_model->build_qr($key,$size, $width));
+			return TRUE;
 	
 	}
+	
+// ------------------------------------------------------------------------
+
+/**
+ * deete()
+ *
+ *  remap the incoming request to the _redirect function
+|* 	this means we don't have to have /r/index/key in the call
+ *
+ * @access	public
+ * @param	string - key - the key of the qr code
+ * @return	REDIRECT
+ */
 	
 	public function delete($key)
 	{

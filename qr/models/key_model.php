@@ -10,7 +10,16 @@ Class Key_model extends CI_Model
 		parent::__construct();
 	}
 	
-	// get number of urls in database
+// ------------------------------------------------------------------------
+
+/**
+ * count_all()
+ *
+ *  returns a count of all the codes in the database
+ *
+ * @access	public
+ * @return	integer
+ */
 	public function count_all()
 	{
 		$this->db->where("redirect_status",1);
@@ -19,7 +28,20 @@ Class Key_model extends CI_Model
 		return $count->num_rows();
 	}
 	
-	// get url with paging
+// ------------------------------------------------------------------------
+
+/**
+ * get_paged_list()
+ *
+ *  get all QR code data w/ paging
+ *
+ * @access	public
+ * @param	$limit - integer
+ * @param	$offset - integer
+ * @param	$sort - string (asc, desc)
+ * @param	$redirect_id
+ * @return	SQL Result
+ */
 	public function get_paged_list($limit = 10, $offset = 0, $sort = "desc", $redirect_id = NULL){
 		
 		$this->db->order_by('id',$sort);
@@ -29,16 +51,18 @@ Class Key_model extends CI_Model
 		
 	}
 	
-	public function get_new_codes()
-	{
-		
-		$this->db->order_by('id',"desc");
-		$this->db->where("redirect_status",1);
-		$this->db->limit(10);
-		$result_sql = $this->db->get($this->tbl);
-		return $result_sql;
-	}
-	
+
+// ------------------------------------------------------------------------
+
+/**
+ * get_details()
+ *
+ *  returns the details about a QR Code
+ *
+ * @access	public
+ * @param	$key - string
+ * @return	key array
+ */	
 	
 	public function get_details($key)
 	{
@@ -62,6 +86,18 @@ Class Key_model extends CI_Model
 		
 	}
 	
+// ------------------------------------------------------------------------
+
+/**
+ * get_click_count()
+ *
+ *  returns total number of times a qr has been scanned
+ *
+ * @access	public
+ * @param	$key - string
+ * @return	integer
+ */	
+	
 	public function get_click_count($id)
 	{
 		
@@ -69,6 +105,18 @@ Class Key_model extends CI_Model
 		return $key_query->num_rows();
 		
 	}
+
+// ------------------------------------------------------------------------
+
+/**
+ * get_url()
+ *
+ *  returns matching URL redirect for a given key
+ *
+ * @access	public
+ * @param	$key - string
+ * @return	string
+ */		
 	
 	public function get_url($key = NULL)
 	{
@@ -100,7 +148,19 @@ Class Key_model extends CI_Model
 			
 		}
 	}
-	
+
+// ------------------------------------------------------------------------
+
+/**
+ * create_key()
+ *
+ *  creates a new key in the database
+ *
+ * @access	public
+ * @param	$url - string
+ * @param	$notes - string
+ * @return	newly created string
+ */		
 	
 	public function create_key($url = NULL, $redirect_notes = "")
 	{
@@ -116,6 +176,17 @@ Class Key_model extends CI_Model
 			return $key;
 		}
 	}
+	
+// ------------------------------------------------------------------------
+
+/**
+ * _get_key()
+ *
+ *  creates a new random key and makes sure it hasn't been used in the database before
+ *
+ * @access	private
+ * @return	newly created string
+ */		
 	
 	private function _get_key()
 	{
@@ -133,6 +204,17 @@ Class Key_model extends CI_Model
 	    }
     
     }
+    
+// ------------------------------------------------------------------------
+
+/**
+ * _random_string()
+ *
+ *  creates a new random string
+ *
+ * @access	private
+ * @return	newly created string
+ */		
     
     private function _random_string($count = 10)
     {
@@ -152,13 +234,38 @@ Class Key_model extends CI_Model
 	
 	    return $pass;
     }
-    
+   
+// ------------------------------------------------------------------------
+
+/**
+ * count_all_days()
+ *
+ *  returns count of unique days of scan data
+ *
+ * @access	public
+ * @return	integer
+ */ 
     
     public function count_all_days()
 	{
 		$count_query = $this->db->query("SELECT DISTINCT(date_format(tracking_datetime,'%M %d %Y')) FROM qr_tracking");
 		return $count_query->num_rows();
 	}
+	
+// ------------------------------------------------------------------------
+
+/**
+ * get_paged_list_days()
+ *
+ *  returns all unique days worth of QR code scans
+ *
+ * @access	public
+ * @param	$limit - integer
+ * @param	$offset - integer
+ * @param	$sort - string (asc, desc)
+ * @param	$redirect_id
+ * @return	SQL Result
+ */ 
 
 	public function get_paged_list_days($limit = 10, $offset = 0, $sort = "asc", $redirect_id = NULL)
 	{
@@ -194,6 +301,16 @@ Class Key_model extends CI_Model
 		return $query;
 	}
 	
+// ------------------------------------------------------------------------
+
+/**
+ * delete()
+ *
+ *  deletes a key by setting it's status to 0
+ *
+ * @access	public
+ * @return	TRUE
+ */ 
 	
 	public function delete($key)
 	{

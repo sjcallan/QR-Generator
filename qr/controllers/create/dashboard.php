@@ -81,19 +81,39 @@ class Dashboard extends CI_Controller {
 			);
 			
 			$this->table->set_template($tmpl); 
-			$this->table->set_heading('','Key', 'Redirect', 'Creation Date','Details','Hi-Res','Scans');
+			$this->table->set_heading('','Key', 'Type', 'Redirect', 'Creation Date','Details','Hi-Res','Scans');
 		
 			foreach ($entries as $entry)
 			{
-				$date = $entry->redirect_date_created;
-				$link = $entry->redirect_url;
-				$click_count = $this->key_model->get_click_count($entry->id);
+				if($entry->redirect_date_created == NULL)
+				{
+					$date = "-";
+				}
+				else
+				{
+					$date = $entry->redirect_date_created;
+				}
+				
+				if($entry->redirect_type == "url")
+				{
+					$link = $entry->redirect_url;
+					$click_count = $this->key_model->get_click_count($entry->id);
+					$code_content = "<a href='" . $link . "' title='" . $link . "'>" . trim_string($link,30) . "</a><br />" . $entry->redirect_notes;
+				}
+				else
+				{
+					$code_content = $entry->redirect_notes;
+					$click_count = "NA";
+				}
 			
 				$this->table->add_row(
 					$this->qr_model->build_qr($entry->redirect_key,"5","30"),
-					$entry->redirect_key, "<a href='" . $link . "' title='" . $link . "'>" . trim_string($link,30) . "</a><br />" . $entry->redirect_notes, 
-					$date, 
-					"<a href='" . site_url("/create/codes/details/" . $entry->redirect_key) . "'>Details</a>","<a href='" . site_url("/create/codes/generate/" . $entry->redirect_key ."/100/1200") . "' target='_blank'>Download</a>",$click_count);
+					$entry->redirect_key, 
+					$entry->redirect_type,
+					$code_content, 
+					$date,
+					"<a href='" . site_url("create/codes/details/" . $entry->redirect_key) . "'>Details</a>","<a href='" . site_url("create/codes/generate/" . $entry->redirect_key ."/100/1200") . "' target='_blank'>Download</a>",
+					$click_count);
 					
 			}
 		

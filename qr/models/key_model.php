@@ -66,7 +66,7 @@ Class Key_model extends CI_Model
 	
 	public function get_details($key)
 	{
-		$key_details = $this->db->query("SELECT id,redirect_url, redirect_key, redirect_notes, redirect_date_created FROM qr_redirects WHERE redirect_key=? AND redirect_status=1",array($key));
+		$key_details = $this->db->query("SELECT id,redirect_url, redirect_key, redirect_notes, redirect_date_created, redirect_type FROM qr_redirects WHERE redirect_key=? AND redirect_status=1",array($key));
 		
 		if($key_details->num_rows() > 0)
 		{
@@ -75,6 +75,7 @@ Class Key_model extends CI_Model
 				"redirect_url" => $key_details->row("redirect_url"),
 				"redirect_notes" => $key_details->row("redirect_notes"),
 				"redirect_key" => $key_details->row("redirect_key"),
+				"redirect_type" => $key_details->row("redirect_type"),
 				"redirect_date_created" => $key_details->row("redirect_date_created"),
 				"redirect_click_count"=>$this->get_click_count($key_details->row("id"))	
 			);
@@ -152,29 +153,23 @@ Class Key_model extends CI_Model
 // ------------------------------------------------------------------------
 
 /**
- * create_key()
+ * create_qr_code()
  *
  *  creates a new key in the database
  *
  * @access	public
  * @param	$url - string
  * @param	$notes - string
+ * @param	$redirect_type - string defaults URL
  * @return	newly created string
  */		
 	
-	public function create_key($url = NULL, $redirect_notes = "")
+	public function create_qr_code($url, $redirect_notes = "", $redirect_type = "url")
 	{
-		if($url == NULL)
-		{
-			return "";
-		}
-		else
-		{
-			$key = $this->_get_key();
-			$this->db->query("INSERT INTO qr_redirects (redirect_url,redirect_key,redirect_notes,redirect_date_created,redirect_status) values (?,?,?,NOW(),1)",array($url,$key,$redirect_notes));
+		$key = $this->_get_key();
+		$this->db->query("INSERT INTO qr_redirects (redirect_url,redirect_key,redirect_notes,redirect_date_created,redirect_status,redirect_type) values (?,?,?,NOW(),1,?)",array($url,$key,$redirect_notes, $redirect_type));
 			
-			return $key;
-		}
+		return $key;
 	}
 	
 // ------------------------------------------------------------------------

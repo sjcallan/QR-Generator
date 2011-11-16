@@ -20,10 +20,17 @@
 
 <div style="margin-left:110px">
 	<h3>Details</h3>
-	<p><strong>URL:</strong> <a href="<?= $redirect_details["redirect_url"] ?>"><?= $redirect_details["redirect_url"] ?></a></p>
+	<p><strong>Code Data:</strong> <?= $code_data ?></p>
 	<p><strong>QR URL:</strong> <a href="<?= site_url("r/" . $redirect_details["redirect_key"]) ?>"><?= site_url("r/" . $redirect_details["redirect_key"]) ?></a></p>
 	<p><strong>Date Created:</strong> <?= $redirect_details["redirect_date_created"] ?></p>
-	<p><strong>Total Scans:</strong> <?= $redirect_details["redirect_click_count"] ?></p>
+	<?php
+	if($redirect_details["redirect_type"] == "url")
+	{
+	?>
+		<p><strong>Total Scans:</strong> <?= $redirect_details["redirect_click_count"] ?></p>
+	<?php
+	}
+	?>
 	<p><a href="<?= site_url("create/codes/generate/" . $redirect_details["redirect_key"] . "/100/1200") ?>" class="btn primary">Download Code</a></p>
 </div>
 

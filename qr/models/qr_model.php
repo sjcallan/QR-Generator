@@ -22,18 +22,50 @@ class Qr_model extends CI_Model {
  * @return	img HTML tag string
  */
 	
-	public function build_qr($key,$size, $width)
+	public function build_qr($key, $size, $width)
 	{
 	
-		/* Get the URL & Track the key */
-			$redirect_url = site_url("r/" . $key);
-			
-			/* Load the Library */
-			$this->qr_code_lib->data = $redirect_url;
+		/* Get the type of QR code this is */
+			$code_data = $this->key_model->get_details($key);
+			$code_type = $code_data["redirect_type"];
+			$code_notes = $code_data["redirect_notes"];
+	
+			if($code_type == "url")
+			{
+				$code_content = site_url("r/" . $key);
+			}
+			else
+			{
+				$code_content = $code_notes;	
+			}
+	
+		/* Load the Library */
+			$this->qr_code_lib->data = $code_content;
     		$this->qr_code_lib->size = $size;
 		
 		/* Return the image */
 			return "<img src='" . $this->qr_code_lib->build() . "' width='" . $width . "'/>";
+		
+	}
+	
+// ------------------------------------------------------------------------
+
+/**
+ * get_code_type()
+ *
+ *  gets the type of QR code this is
+ *
+ * @access	public
+ * @param	string - $key - the qr code key
+ * @return	string code type
+ */	
+	
+	public function get_code_type($key)
+	{
+		$this->db->select("redirect_type");
+		$qr_query = $this->db->get("qr_redirects");
+		
+		return $qr_query->row("redirect_type");
 		
 	}
 	

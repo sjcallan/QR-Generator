@@ -32,7 +32,8 @@ Class Install extends CI_Controller
 				"redirect_url" => array("type"=>"VARCHAR","constraint"=>"255"),
 				"redirect_notes"=>array("type"=>"LONGTEXT"),
 				"redirect_date_created"=>array("type"=>"DATETIME"),
-				"redirect_status"=>array("type"=>"INT","default"=>1)
+				"redirect_status"=>array("type"=>"INT","default"=>1),
+				"redirect_type"=>array("type"=>"VARCHAR","constraint"=>"50")
 			);
 			
 			$this->dbforge->add_field($field_array);

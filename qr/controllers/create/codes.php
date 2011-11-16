@@ -76,8 +76,7 @@ Class Codes extends CI_Controller
 			);
 			
 			$this->table->set_template($tmpl); 
-			$this->table->set_heading('','Key', 'Redirect', 'Creation Date','Details','Hi-Res','Scans');
-			$i = 0 + $offset;
+			$this->table->set_heading('','Key', 'Type', 'Code Content', 'Creation Date','Details','Hi-Res','Scans');
 		
 			foreach ($entries as $entry)
 			{
@@ -90,15 +89,26 @@ Class Codes extends CI_Controller
 					$date = $entry->redirect_date_created;
 				}
 				
-				$link = $entry->redirect_url;
-				$click_count = $this->key_model->get_click_count($entry->id);
+				if($entry->redirect_type == "url")
+				{
+					$link = $entry->redirect_url;
+					$click_count = $this->key_model->get_click_count($entry->id);
+					$code_content = "<a href='" . $link . "' title='" . $link . "'>" . trim_string($link,30) . "</a><br />" . $entry->redirect_notes;
+				}
+				else
+				{
+					$code_content = $entry->redirect_notes;
+					$click_count = "NA";
+				}
 			
 				$this->table->add_row(
 					$this->qr_model->build_qr($entry->redirect_key,"5","30"),
-					$entry->redirect_key, "<a href='" . $link . "' title='" . $link . "'>" . trim_string($link,30) . "</a><br />" . $entry->redirect_notes, 
-					$date, 
-					"<a href='" . site_url("create/codes/details/" . $entry->redirect_key) . "'>Details</a>","<a href='" . site_url("create/codes/generate/" . $entry->redirect_key ."/100/1200") . "' target='_blank'>Download</a>",$click_count);
-				++$i;
+					$entry->redirect_key, 
+					$entry->redirect_type,
+					$code_content, 
+					$date,
+					"<a href='" . site_url("create/codes/details/" . $entry->redirect_key) . "'>Details</a>","<a href='" . site_url("create/codes/generate/" . $entry->redirect_key ."/100/1200") . "' target='_blank'>Download</a>",
+					$click_count);
 			}
 		
 		
@@ -124,10 +134,19 @@ Class Codes extends CI_Controller
 	public function create()
 	{
 	
-		$url = "http://" . $this->input->post("url");
 		$notes = $this->input->post("notes");
-		$key = $this->key_model->create_key($url, $notes);
-		$redirect_url = site_url() . "r/" . $key;
+		$redirect_type = $this->input->post("type");
+		
+		if($redirect_type == "url")
+		{
+			$url = "http://" . $this->input->post("url");
+		}
+		else
+		{
+			$url = "";
+		}
+		
+		$key = $this->key_model->create_qr_code($url, $notes, $redirect_type);
 		
 		$_SESSION['success_message'] = 'The code was created successfully.';
 		redirect(site_url("create/codes"));
@@ -148,55 +167,75 @@ Class Codes extends CI_Controller
 	
 	public function details($key)
 	{
-			$key_details = $this->key_model->get_details($key);
+		$key_details = $this->key_model->get_details($key);
 	
-		/* Genereate Chart Data */
-			
-			$total_records = $this->key_model->count_all_days();
-			$start_point = $total_records-$this->limit;
-			
-			if($start_point < 0)
-			{
-				$start_point = 0;
-			}
-			
-			$graph_entries = $this->key_model->get_paged_list_days($this->graph_limit, $start_point, "asc", $key_details["id"])->result();
-			
-			$this->highcharts_lib
-				->set_graph_type('spline')
-				->toggle_legend(TRUE)
-				->display_shadow(TRUE)
-				->set_xlabels_otpions('rotation', -45)
-				->set_graph_title('')
-				->set_yAxis(array(), 'Scans')
-				->add_serie('Scans over the last 30 days', array(),'areaspline');
-			
-			foreach ($graph_entries as $entry)
-			{
-				$graph_date =  $entry->graph_date;	
+		if($key_details == "url")
+		{
+	
+			/* Genereate Chart Data */
 				
-				if($entry->click_count == NULL)
+				$total_records = $this->key_model->count_all_days();
+				$start_point = $total_records-$this->limit;
+				
+				if($start_point < 0)
 				{
-					$click_count = "0";
+					$start_point = 0;
 				}
-				else
+				
+				$graph_entries = $this->key_model->get_paged_list_days($this->graph_limit, $start_point, "asc", $key_details["id"])->result();
+				
+				$this->highcharts_lib
+					->set_graph_type('spline')
+					->toggle_legend(TRUE)
+					->display_shadow(TRUE)
+					->set_xlabels_otpions('rotation', -45)
+					->set_graph_title('')
+					->set_yAxis(array(), 'Scans')
+					->add_serie('Scans over the last 30 days', array(),'areaspline');
+				
+				foreach ($graph_entries as $entry)
 				{
-					$click_count = $entry->click_count;
-				}
-			
-				$this->highcharts_lib->push_serie_data('Scans over the last 30 days', $click_count);
-				$this->highcharts_lib->push_xAxis_value($graph_date);
-			}	
-			
-			$s_graph = $this->highcharts_lib->render();
-			$view_data["graph_source"] = $s_graph;
+					$graph_date =  $entry->graph_date;	
+					
+					if($entry->click_count == NULL)
+					{
+						$click_count = "0";
+					}
+					else
+					{
+						$click_count = $entry->click_count;
+					}
+				
+					$this->highcharts_lib->push_serie_data('Scans over the last 30 days', $click_count);
+					$this->highcharts_lib->push_xAxis_value($graph_date);
+				}	
+				
+				$s_graph = $this->highcharts_lib->render();
+				$view_data["graph_source"] = $s_graph;
+				
+		}
+		else
+		{
+			$view_data["graph_source"] = "Not Available";
+		}
 		
 		/* Details Page data */
 			$view_data["redirect_details"] = $key_details;
 			$view_data["qr_code"] = $this->qr_model->build_qr($key,"15","100");
+			
+			if($key_details["redirect_type"] == "url")
+			{
+				$code_data = "<a href='" . $key_details["redirect_url"] . "'>" . $key_details["redirect_url"] . "</a>";
+			}
+			else
+			{
+				$code_data = $key_details["redirect_notes"];
+			}
+			
+			$view_data["code_data"] = $code_data;
 		
 		/* Master Data */		
-			$master_data["page_title"] = "Code Details - <small>" . $key_details["redirect_url"] . "</small>";
+			$master_data["page_title"] = "Code Details - <small>" . $code_data . "</small>";
 			$master_data["view"] = $this->load->view("details",$view_data,TRUE);	
 			
 			$this->load->view("_master",$master_data);

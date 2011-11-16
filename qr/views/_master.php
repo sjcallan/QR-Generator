@@ -87,6 +87,19 @@
 		});
 		
 		$(".alert-message").alert('close');
+		
+		$("#type").change(function(){
+			var selected_value = $(this).val();
+			
+			if(selected_value == "url")
+			{
+				$("#url_block").fadeIn();
+			}
+			else
+			{
+				$("#url_block").fadeOut();	
+			}
+		});
 	    
 	}); 
 
@@ -106,6 +119,13 @@
           <div class="modal-body">
 	
 				<div class="clearfix">
+			        <label for="type">What Type of Code?</label>
+			        <div class="input">
+			            <select name="type" id="type"><option value="url">URL</option><option value="text">Text</option></select>
+			        </div>
+			      </div><!-- /clearfix -->
+	
+				<div class="clearfix" id="url_block">
 			        <label for="url">URL</label>
 			        <div class="input">
 			          <div class="input-prepend">
@@ -116,7 +136,7 @@
 			      </div><!-- /clearfix -->
 			      
 			      <div class="clearfix">
-			        <label for="notes">Notes</label>
+			        <label for="notes">Message/Notes</label>
 			        <div class="input">
 			          <textarea class="xlarge" name="notes" id="notes"></textarea>
 			        </div>
